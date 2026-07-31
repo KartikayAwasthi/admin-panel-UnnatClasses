@@ -145,12 +145,12 @@ export default function PostsPage({ autoOpenCreate, onAutoOpenHandled }: Props) 
               )}
               {posts.map((post) => (
                 <tr key={post.id}>
-                  <td className="cell-title">{post.title}</td>
-                  <td>{post.author}</td>
-                  <td>
+                  <td className="cell-title" data-label="Title">{post.title}</td>
+                  <td data-label="Author">{post.author}</td>
+                  <td data-label="Tag">
                     <span className="badge">{post.tag}</span>
                   </td>
-                  <td>{post.date}</td>
+                  <td data-label="Date">{post.date}</td>
                   <td className="row-actions">
                     <button className="icon-btn" title="Edit" onClick={() => setDialog({ kind: "edit", post })}>
                       <Pencil size={15} />

@@ -153,11 +153,11 @@ export default function CurrentAffairsPage({ autoOpenCreate, onAutoOpenHandled }
               )}
               {items.map((item) => (
                 <tr key={item.id}>
-                  <td className="cell-title">{item.title}</td>
-                  <td>
+                  <td className="cell-title" data-label="Title">{item.title}</td>
+                  <td data-label="Category">
                     <span className="badge">{item.category}</span>
                   </td>
-                  <td>{item.date}</td>
+                  <td data-label="Date">{item.date}</td>
                   <td className="row-actions">
                     <button className="icon-btn" title="Edit" onClick={() => setDialog({ kind: "edit", item })}>
                       <Pencil size={15} />

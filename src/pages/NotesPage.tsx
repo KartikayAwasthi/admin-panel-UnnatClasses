@@ -150,15 +150,15 @@ export default function NotesPage({ autoOpenCreate, onAutoOpenHandled }: Props) 
               )}
               {notes.map((note) => (
                 <tr key={note.id}>
-                  <td className="cell-title">{note.title}</td>
-                  <td>{note.subject}</td>
-                  <td>{note.classRange}</td>
-                  <td>
+                  <td className="cell-title" data-label="Title">{note.title}</td>
+                  <td data-label="Subject">{note.subject}</td>
+                  <td data-label="Class">{note.classRange}</td>
+                  <td data-label="File">
                     <a className="badge badge-link" href={fileUrl(note.fileUrl)} target="_blank" rel="noreferrer">
                       {note.fileType} · {note.fileSize}
                     </a>
                   </td>
-                  <td>{note.uploadedAt}</td>
+                  <td data-label="Uploaded">{note.uploadedAt}</td>
                   <td className="row-actions">
                     <button
                       className="icon-btn"
