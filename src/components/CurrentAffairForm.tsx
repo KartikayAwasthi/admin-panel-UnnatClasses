@@ -132,7 +132,7 @@ export default function CurrentAffairForm({ initial, submitting, errors, onSubmi
         <input
           id="ca-cover"
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+          accept="image/*"
           onChange={(e) => setCoverImageFile(e.target.files?.[0] ?? null)}
         />
         {!coverImageFile && values.coverImageUrl && (

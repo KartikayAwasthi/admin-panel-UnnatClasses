@@ -139,7 +139,7 @@ export default function PostForm({ initial, submitting, errors, onSubmit, onCanc
         <input
           id="p-cover"
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+          accept="image/*"
           onChange={(e) => setCoverImageFile(e.target.files?.[0] ?? null)}
         />
         {!coverImageFile && values.coverImageUrl && (

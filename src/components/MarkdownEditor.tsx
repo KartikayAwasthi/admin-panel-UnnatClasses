@@ -153,7 +153,7 @@ export default function MarkdownEditor({ id, value, onChange, rows = 8, placehol
           <input
             ref={imageInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+            accept="image/*"
             className="md-image-input"
             onChange={handleImageSelected}
           />
