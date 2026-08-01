@@ -40,6 +40,22 @@ function wrapSelection(text: string, start: number, end: number, before: string,
   };
 }
 
+// Without this, an image inserted right after existing text (e.g. a bullet
+// list) with no blank line before it gets parsed as a lazy continuation of
+// that block instead of its own image — it ends up invisibly buried inside
+// the previous paragraph/list item instead of rendering as a picture.
+function leadingBreak(before: string): string {
+  if (before.length === 0) return "";
+  if (/\n[ \t]*\n[ \t]*$/.test(before)) return "";
+  return before.endsWith("\n") ? "\n" : "\n\n";
+}
+
+function trailingBreak(after: string): string {
+  if (after.length === 0) return "";
+  if (/^[ \t]*\n[ \t]*\n/.test(after)) return "";
+  return after.startsWith("\n") ? "\n" : "\n\n";
+}
+
 export default function MarkdownEditor({ id, value, onChange, rows = 8, placeholder }: Props) {
   const [mode, setMode] = useState<"write" | "preview">("write");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -102,12 +118,16 @@ export default function MarkdownEditor({ id, value, onChange, rows = 8, placehol
     try {
       const url = await uploadImage(file);
       const { selectionStart: start, selectionEnd: end, value: text } = el;
-      const markdown = `![${file.name}](${url})`;
-      const next = text.slice(0, start) + markdown + text.slice(end);
+      const before = text.slice(0, start);
+      const after = text.slice(end);
+      const lead = leadingBreak(before);
+      const trail = trailingBreak(after);
+      const image = `![${file.name}](${url})`;
+      const next = before + lead + image + trail + after;
       onChange(next);
       requestAnimationFrame(() => {
         el.focus();
-        const pos = start + markdown.length;
+        const pos = (before + lead + image).length;
         el.setSelectionRange(pos, pos);
       });
     } catch (err) {
