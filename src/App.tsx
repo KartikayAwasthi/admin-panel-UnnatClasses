@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   BookOpenCheck,
+  Images,
   Newspaper,
   Megaphone,
   ExternalLink,
@@ -12,18 +13,25 @@ import {
 import DashboardPage from "./pages/DashboardPage";
 import NotesPage from "./pages/NotesPage";
 import CurrentAffairsPage from "./pages/CurrentAffairsPage";
+import DailyCurrentAffairsPage from "./pages/DailyCurrentAffairsPage";
 import PostsPage from "./pages/PostsPage";
 import LoginPage from "./pages/LoginPage";
 import { LIVE_SITE_URL } from "./constants";
 import { setOnUnauthorized } from "./api/client";
 import { clearToken, getToken } from "./auth/session";
 
-type ResourceTab = "notes" | "current-affairs" | "posts";
+type ResourceTab = "notes" | "current-affairs" | "daily-current-affairs" | "posts";
 type Tab = "dashboard" | ResourceTab;
 
 const RESOURCE_TABS: { key: ResourceTab; label: string; description: string; icon: typeof BookOpenCheck }[] = [
   { key: "notes", label: "Notes", description: "PDF & DOC study material", icon: BookOpenCheck },
   { key: "current-affairs", label: "Current Affairs", description: "GS current affairs entries", icon: Newspaper },
+  {
+    key: "daily-current-affairs",
+    label: "Daily Current Affairs",
+    description: "Instagram-style image posts",
+    icon: Images,
+  },
   { key: "posts", label: "Posts", description: "Announcements & articles", icon: Megaphone },
 ];
 
@@ -141,6 +149,12 @@ export default function App() {
         {tab === "current-affairs" && (
           <CurrentAffairsPage
             autoOpenCreate={pendingCreateTab === "current-affairs"}
+            onAutoOpenHandled={() => setPendingCreateTab(null)}
+          />
+        )}
+        {tab === "daily-current-affairs" && (
+          <DailyCurrentAffairsPage
+            autoOpenCreate={pendingCreateTab === "daily-current-affairs"}
             onAutoOpenHandled={() => setPendingCreateTab(null)}
           />
         )}

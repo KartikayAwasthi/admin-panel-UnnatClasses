@@ -42,6 +42,22 @@ export type CurrentAffairFormValues = {
   published: boolean;
 };
 
+export type DailyCurrentAffair = {
+  id: number;
+  slug: string;
+  caption: string | null;
+  date: string;
+  images: string[];
+  published: boolean;
+};
+
+export type DailyCurrentAffairFormValues = {
+  caption: string;
+  date: string;
+  images: string[];
+  published: boolean;
+};
+
 export type Post = {
   id: number;
   slug: string;
