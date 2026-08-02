@@ -8,17 +8,19 @@ import {
   Newspaper,
   Plus,
   ArrowUpRight,
+  Video as VideoIcon,
 } from "lucide-react";
-import type { Note, CurrentAffair, DailyCurrentAffair, Exam, Post } from "../types";
+import type { Note, CurrentAffair, DailyCurrentAffair, Exam, Post, Video } from "../types";
 import { listNotes } from "../api/notes";
 import { listCurrentAffairs } from "../api/currentAffairs";
 import { listDailyCurrentAffairs } from "../api/dailyCurrentAffairs";
 import { listExams } from "../api/exams";
 import { listPosts } from "../api/posts";
+import { listVideos } from "../api/videos";
 import { fileUrl } from "../api/client";
 import { LIVE_SITE_URL } from "../constants";
 
-type ResourceTab = "notes" | "current-affairs" | "daily-current-affairs" | "exams" | "posts";
+type ResourceTab = "notes" | "current-affairs" | "daily-current-affairs" | "exams" | "posts" | "videos";
 
 type Props = {
   onNavigate: (tab: ResourceTab, openCreate?: boolean) => void;
@@ -38,7 +40,8 @@ function toActivity(
   currentAffairs: CurrentAffair[],
   dailyCurrentAffairs: DailyCurrentAffair[],
   exams: Exam[],
-  posts: Post[]
+  posts: Post[],
+  videos: Video[]
 ): ActivityItem[] {
   const items: ActivityItem[] = [
     ...notes.map((n) => ({
@@ -81,6 +84,14 @@ function toActivity(
       date: p.date,
       href: `${LIVE_SITE_URL}/resources/posts/${p.slug}`,
     })),
+    ...videos.map((v) => ({
+      id: `video-${v.id}`,
+      type: "videos" as const,
+      title: v.title,
+      meta: v.category,
+      date: v.date,
+      href: `${LIVE_SITE_URL}/resources/videos/${v.slug}`,
+    })),
   ];
   return items.sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 8);
 }
@@ -91,6 +102,7 @@ const TYPE_META: Record<ResourceTab, { label: string; icon: typeof BookOpenCheck
   "daily-current-affairs": { label: "Daily Current Affairs", icon: Images },
   exams: { label: "Exam", icon: GraduationCap },
   posts: { label: "Post", icon: Megaphone },
+  videos: { label: "Video", icon: VideoIcon },
 };
 
 export default function DashboardPage({ onNavigate }: Props) {
@@ -99,6 +111,7 @@ export default function DashboardPage({ onNavigate }: Props) {
   const [dailyCurrentAffairs, setDailyCurrentAffairs] = useState<DailyCurrentAffair[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -106,14 +119,22 @@ export default function DashboardPage({ onNavigate }: Props) {
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
-    Promise.all([listNotes(), listCurrentAffairs(), listDailyCurrentAffairs(), listExams(), listPosts()])
-      .then(([n, c, d, e, p]) => {
+    Promise.all([
+      listNotes(),
+      listCurrentAffairs(),
+      listDailyCurrentAffairs(),
+      listExams(),
+      listPosts(),
+      listVideos(),
+    ])
+      .then(([n, c, d, e, p, v]) => {
         if (cancelled) return;
         setNotes(n);
         setCurrentAffairs(c);
         setDailyCurrentAffairs(d);
         setExams(e);
         setPosts(p);
+        setVideos(v);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -128,8 +149,8 @@ export default function DashboardPage({ onNavigate }: Props) {
   }, []);
 
   const totalResources =
-    notes.length + currentAffairs.length + dailyCurrentAffairs.length + exams.length + posts.length;
-  const activity = toActivity(notes, currentAffairs, dailyCurrentAffairs, exams, posts);
+    notes.length + currentAffairs.length + dailyCurrentAffairs.length + exams.length + posts.length + videos.length;
+  const activity = toActivity(notes, currentAffairs, dailyCurrentAffairs, exams, posts, videos);
 
   return (
     <section>
@@ -192,6 +213,15 @@ export default function DashboardPage({ onNavigate }: Props) {
                 <div className="stat-label">Posts</div>
               </div>
             </div>
+            <div className="stat-card">
+              <div className="stat-icon stat-icon-posts">
+                <VideoIcon size={18} />
+              </div>
+              <div>
+                <div className="stat-value">{videos.length}</div>
+                <div className="stat-label">Videos</div>
+              </div>
+            </div>
             <div className="stat-card stat-card-total">
               <div>
                 <div className="stat-value">{totalResources}</div>
@@ -223,6 +253,10 @@ export default function DashboardPage({ onNavigate }: Props) {
                 <button className="quick-action" onClick={() => onNavigate("posts", true)}>
                   <Plus size={18} />
                   <span>New post</span>
+                </button>
+                <button className="quick-action" onClick={() => onNavigate("videos", true)}>
+                  <Plus size={18} />
+                  <span>New video</span>
                 </button>
               </div>
             </div>

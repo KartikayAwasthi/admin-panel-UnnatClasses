@@ -110,6 +110,28 @@ export type PostFormValues = {
   published: boolean;
 };
 
+export type Video = {
+  id: number;
+  slug: string;
+  title: string;
+  youtubeUrl: string;
+  videoId: string;
+  thumbnailUrl: string;
+  category: string;
+  description: string;
+  date: string;
+  published: boolean;
+};
+
+export type VideoFormValues = {
+  title: string;
+  youtubeUrl: string;
+  category: string;
+  description: string;
+  date: string;
+  published: boolean;
+};
+
 export type ApiError = {
   status: number;
   error: string;
