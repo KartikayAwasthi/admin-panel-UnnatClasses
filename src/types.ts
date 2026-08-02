@@ -58,6 +58,34 @@ export type DailyCurrentAffairFormValues = {
   published: boolean;
 };
 
+export type Exam = {
+  id: number;
+  slug: string;
+  title: string;
+  category: string;
+  examDate: string | null;
+  summary: string;
+  aboutExam: string;
+  examPattern: string;
+  syllabus: string;
+  coverImageUrl: string | null;
+  officialLink: string | null;
+  published: boolean;
+};
+
+export type ExamFormValues = {
+  title: string;
+  category: string;
+  examDate: string;
+  summary: string;
+  aboutExam: string;
+  examPattern: string;
+  syllabus: string;
+  coverImageUrl: string | null;
+  officialLink: string;
+  published: boolean;
+};
+
 export type Post = {
   id: number;
   slug: string;

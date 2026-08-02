@@ -2,21 +2,23 @@ import { useEffect, useState } from "react";
 import {
   BookOpenCheck,
   FilePlus2,
+  GraduationCap,
   Images,
   Megaphone,
   Newspaper,
   Plus,
   ArrowUpRight,
 } from "lucide-react";
-import type { Note, CurrentAffair, DailyCurrentAffair, Post } from "../types";
+import type { Note, CurrentAffair, DailyCurrentAffair, Exam, Post } from "../types";
 import { listNotes } from "../api/notes";
 import { listCurrentAffairs } from "../api/currentAffairs";
 import { listDailyCurrentAffairs } from "../api/dailyCurrentAffairs";
+import { listExams } from "../api/exams";
 import { listPosts } from "../api/posts";
 import { fileUrl } from "../api/client";
 import { LIVE_SITE_URL } from "../constants";
 
-type ResourceTab = "notes" | "current-affairs" | "daily-current-affairs" | "posts";
+type ResourceTab = "notes" | "current-affairs" | "daily-current-affairs" | "exams" | "posts";
 
 type Props = {
   onNavigate: (tab: ResourceTab, openCreate?: boolean) => void;
@@ -35,6 +37,7 @@ function toActivity(
   notes: Note[],
   currentAffairs: CurrentAffair[],
   dailyCurrentAffairs: DailyCurrentAffair[],
+  exams: Exam[],
   posts: Post[]
 ): ActivityItem[] {
   const items: ActivityItem[] = [
@@ -62,6 +65,14 @@ function toActivity(
       date: d.date,
       href: `${LIVE_SITE_URL}/resources/daily-current-affairs/${d.slug}`,
     })),
+    ...exams.map((e) => ({
+      id: `exam-${e.id}`,
+      type: "exams" as const,
+      title: e.title,
+      meta: e.category,
+      date: e.examDate ?? "",
+      href: `${LIVE_SITE_URL}/exams/${e.slug}`,
+    })),
     ...posts.map((p) => ({
       id: `post-${p.id}`,
       type: "posts" as const,
@@ -78,6 +89,7 @@ const TYPE_META: Record<ResourceTab, { label: string; icon: typeof BookOpenCheck
   notes: { label: "Note", icon: BookOpenCheck },
   "current-affairs": { label: "Current Affairs", icon: Newspaper },
   "daily-current-affairs": { label: "Daily Current Affairs", icon: Images },
+  exams: { label: "Exam", icon: GraduationCap },
   posts: { label: "Post", icon: Megaphone },
 };
 
@@ -85,6 +97,7 @@ export default function DashboardPage({ onNavigate }: Props) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [currentAffairs, setCurrentAffairs] = useState<CurrentAffair[]>([]);
   const [dailyCurrentAffairs, setDailyCurrentAffairs] = useState<DailyCurrentAffair[]>([]);
+  const [exams, setExams] = useState<Exam[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -93,12 +106,13 @@ export default function DashboardPage({ onNavigate }: Props) {
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
-    Promise.all([listNotes(), listCurrentAffairs(), listDailyCurrentAffairs(), listPosts()])
-      .then(([n, c, d, p]) => {
+    Promise.all([listNotes(), listCurrentAffairs(), listDailyCurrentAffairs(), listExams(), listPosts()])
+      .then(([n, c, d, e, p]) => {
         if (cancelled) return;
         setNotes(n);
         setCurrentAffairs(c);
         setDailyCurrentAffairs(d);
+        setExams(e);
         setPosts(p);
       })
       .catch((err) => {
@@ -113,8 +127,9 @@ export default function DashboardPage({ onNavigate }: Props) {
     };
   }, []);
 
-  const totalResources = notes.length + currentAffairs.length + dailyCurrentAffairs.length + posts.length;
-  const activity = toActivity(notes, currentAffairs, dailyCurrentAffairs, posts);
+  const totalResources =
+    notes.length + currentAffairs.length + dailyCurrentAffairs.length + exams.length + posts.length;
+  const activity = toActivity(notes, currentAffairs, dailyCurrentAffairs, exams, posts);
 
   return (
     <section>
@@ -160,6 +175,15 @@ export default function DashboardPage({ onNavigate }: Props) {
               </div>
             </div>
             <div className="stat-card">
+              <div className="stat-icon stat-icon-ca">
+                <GraduationCap size={18} />
+              </div>
+              <div>
+                <div className="stat-value">{exams.length}</div>
+                <div className="stat-label">Exams</div>
+              </div>
+            </div>
+            <div className="stat-card">
               <div className="stat-icon stat-icon-posts">
                 <Megaphone size={18} />
               </div>
@@ -191,6 +215,10 @@ export default function DashboardPage({ onNavigate }: Props) {
                 <button className="quick-action" onClick={() => onNavigate("daily-current-affairs", true)}>
                   <Plus size={18} />
                   <span>New daily current affairs post</span>
+                </button>
+                <button className="quick-action" onClick={() => onNavigate("exams", true)}>
+                  <Plus size={18} />
+                  <span>New exam notification</span>
                 </button>
                 <button className="quick-action" onClick={() => onNavigate("posts", true)}>
                   <Plus size={18} />
