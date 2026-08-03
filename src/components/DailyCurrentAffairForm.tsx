@@ -18,7 +18,7 @@ type ImageItem = {
   existingUrl?: string;
 };
 
-const MAX_IMAGES = 10;
+const MAX_IMAGES = 25;
 
 function emptyValues(): { caption: string; date: string; published: boolean } {
   return {
