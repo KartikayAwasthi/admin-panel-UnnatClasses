@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   BookOpenCheck,
+  Camera,
   FilePlus2,
   GraduationCap,
   Images,
@@ -10,17 +11,25 @@ import {
   ArrowUpRight,
   Video as VideoIcon,
 } from "lucide-react";
-import type { Note, CurrentAffair, DailyCurrentAffair, Exam, Post, Video } from "../types";
+import type { Note, CurrentAffair, DailyCurrentAffair, Exam, Post, Video, InstagramPost } from "../types";
 import { listNotes } from "../api/notes";
 import { listCurrentAffairs } from "../api/currentAffairs";
 import { listDailyCurrentAffairs } from "../api/dailyCurrentAffairs";
 import { listExams } from "../api/exams";
 import { listPosts } from "../api/posts";
 import { listVideos } from "../api/videos";
+import { listInstagramPosts } from "../api/instagramPosts";
 import { fileUrl } from "../api/client";
 import { LIVE_SITE_URL } from "../constants";
 
-type ResourceTab = "notes" | "current-affairs" | "daily-current-affairs" | "exams" | "posts" | "videos";
+type ResourceTab =
+  | "notes"
+  | "current-affairs"
+  | "daily-current-affairs"
+  | "exams"
+  | "posts"
+  | "videos"
+  | "instagram-posts";
 
 type Props = {
   onNavigate: (tab: ResourceTab, openCreate?: boolean) => void;
@@ -41,7 +50,8 @@ function toActivity(
   dailyCurrentAffairs: DailyCurrentAffair[],
   exams: Exam[],
   posts: Post[],
-  videos: Video[]
+  videos: Video[],
+  instagramPosts: InstagramPost[]
 ): ActivityItem[] {
   const items: ActivityItem[] = [
     ...notes.map((n) => ({
@@ -92,6 +102,14 @@ function toActivity(
       date: v.date,
       href: `${LIVE_SITE_URL}/resources/videos/${v.slug}`,
     })),
+    ...instagramPosts.map((ig) => ({
+      id: `ig-${ig.id}`,
+      type: "instagram-posts" as const,
+      title: ig.title,
+      meta: ig.mediaType === "REEL" ? "Reel" : "Post",
+      date: ig.date,
+      href: `${LIVE_SITE_URL}/reels`,
+    })),
   ];
   return items.sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 8);
 }
@@ -103,6 +121,7 @@ const TYPE_META: Record<ResourceTab, { label: string; icon: typeof BookOpenCheck
   exams: { label: "Exam", icon: GraduationCap },
   posts: { label: "Post", icon: Megaphone },
   videos: { label: "Video", icon: VideoIcon },
+  "instagram-posts": { label: "Instagram", icon: Camera },
 };
 
 export default function DashboardPage({ onNavigate }: Props) {
@@ -112,6 +131,7 @@ export default function DashboardPage({ onNavigate }: Props) {
   const [exams, setExams] = useState<Exam[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
+  const [instagramPosts, setInstagramPosts] = useState<InstagramPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -126,8 +146,9 @@ export default function DashboardPage({ onNavigate }: Props) {
       listExams(),
       listPosts(),
       listVideos(),
+      listInstagramPosts(),
     ])
-      .then(([n, c, d, e, p, v]) => {
+      .then(([n, c, d, e, p, v, ig]) => {
         if (cancelled) return;
         setNotes(n);
         setCurrentAffairs(c);
@@ -135,6 +156,7 @@ export default function DashboardPage({ onNavigate }: Props) {
         setExams(e);
         setPosts(p);
         setVideos(v);
+        setInstagramPosts(ig);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -149,8 +171,14 @@ export default function DashboardPage({ onNavigate }: Props) {
   }, []);
 
   const totalResources =
-    notes.length + currentAffairs.length + dailyCurrentAffairs.length + exams.length + posts.length + videos.length;
-  const activity = toActivity(notes, currentAffairs, dailyCurrentAffairs, exams, posts, videos);
+    notes.length +
+    currentAffairs.length +
+    dailyCurrentAffairs.length +
+    exams.length +
+    posts.length +
+    videos.length +
+    instagramPosts.length;
+  const activity = toActivity(notes, currentAffairs, dailyCurrentAffairs, exams, posts, videos, instagramPosts);
 
   return (
     <section>
@@ -222,6 +250,15 @@ export default function DashboardPage({ onNavigate }: Props) {
                 <div className="stat-label">Videos</div>
               </div>
             </div>
+            <div className="stat-card">
+              <div className="stat-icon stat-icon-posts">
+                <Camera size={18} />
+              </div>
+              <div>
+                <div className="stat-value">{instagramPosts.length}</div>
+                <div className="stat-label">Instagram</div>
+              </div>
+            </div>
             <div className="stat-card stat-card-total">
               <div>
                 <div className="stat-value">{totalResources}</div>
@@ -257,6 +294,10 @@ export default function DashboardPage({ onNavigate }: Props) {
                 <button className="quick-action" onClick={() => onNavigate("videos", true)}>
                   <Plus size={18} />
                   <span>New video</span>
+                </button>
+                <button className="quick-action" onClick={() => onNavigate("instagram-posts", true)}>
+                  <Plus size={18} />
+                  <span>New Instagram post</span>
                 </button>
               </div>
             </div>

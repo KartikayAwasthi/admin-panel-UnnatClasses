@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   BookOpenCheck,
+  Camera,
   GraduationCap,
   Images,
   Newspaper,
@@ -19,12 +20,20 @@ import DailyCurrentAffairsPage from "./pages/DailyCurrentAffairsPage";
 import ExamsPage from "./pages/ExamsPage";
 import PostsPage from "./pages/PostsPage";
 import VideosPage from "./pages/VideosPage";
+import InstagramPostsPage from "./pages/InstagramPostsPage";
 import LoginPage from "./pages/LoginPage";
 import { LIVE_SITE_URL } from "./constants";
 import { setOnUnauthorized } from "./api/client";
 import { clearToken, getToken } from "./auth/session";
 
-type ResourceTab = "notes" | "current-affairs" | "daily-current-affairs" | "exams" | "posts" | "videos";
+type ResourceTab =
+  | "notes"
+  | "current-affairs"
+  | "daily-current-affairs"
+  | "exams"
+  | "posts"
+  | "videos"
+  | "instagram-posts";
 type Tab = "dashboard" | ResourceTab;
 
 const RESOURCE_TABS: { key: ResourceTab; label: string; description: string; icon: typeof BookOpenCheck }[] = [
@@ -39,6 +48,7 @@ const RESOURCE_TABS: { key: ResourceTab; label: string; description: string; ico
   { key: "exams", label: "Exams", description: "Competitive exam notifications", icon: GraduationCap },
   { key: "posts", label: "Posts", description: "Announcements & articles", icon: Megaphone },
   { key: "videos", label: "Videos", description: "Free videos from YouTube", icon: VideoIcon },
+  { key: "instagram-posts", label: "Instagram", description: "Reels & posts from Instagram", icon: Camera },
 ];
 
 export default function App() {
@@ -179,6 +189,12 @@ export default function App() {
         {tab === "videos" && (
           <VideosPage
             autoOpenCreate={pendingCreateTab === "videos"}
+            onAutoOpenHandled={() => setPendingCreateTab(null)}
+          />
+        )}
+        {tab === "instagram-posts" && (
+          <InstagramPostsPage
+            autoOpenCreate={pendingCreateTab === "instagram-posts"}
             onAutoOpenHandled={() => setPendingCreateTab(null)}
           />
         )}

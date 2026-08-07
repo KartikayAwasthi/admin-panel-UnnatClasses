@@ -132,6 +132,30 @@ export type VideoFormValues = {
   published: boolean;
 };
 
+export type InstagramMediaType = "REEL" | "POST";
+
+export type InstagramPost = {
+  id: number;
+  slug: string;
+  title: string;
+  permalink: string;
+  mediaType: InstagramMediaType;
+  thumbnailUrl: string;
+  caption: string | null;
+  date: string;
+  published: boolean;
+};
+
+export type InstagramPostFormValues = {
+  title: string;
+  permalink: string;
+  mediaType: InstagramMediaType;
+  thumbnailUrl: string | null;
+  caption: string;
+  date: string;
+  published: boolean;
+};
+
 export type ApiError = {
   status: number;
   error: string;
